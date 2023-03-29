@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <title>Eliminar noticia</title>
+        <meta charset="UTF-8">
+            <!--        <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    </head>
+
+    <body>
+        <h1>Eliminar una noticia</h1>
+        
+        <div>
+            <br>
+                <a th:href="@{/noticia/eliminacionNoticia/__${noticia.idNoticia}__}" type="button" method="POST"> Eliminar </a>
+                
+                <div th:if="${exito != null}">
+                    <p th:text="${exito}"></p>
+                </div>
+
+                <div th:replace= "/fragments/error :: div"></div>
+        </div>
+    </body>
+
+</html>
