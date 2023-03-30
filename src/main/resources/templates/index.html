@@ -1,85 +1,116 @@
 <!DOCTYPE html>
 <html
-  lang="es"
-  
-  xmlns:th="http://www.thymeleaf.org"
-  xlmns:sec="http://www.thymeleaf.org/extras/spring-security"
->
-  <head>
-    <title>Index</title>
-    <meta charset="UTF-8" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
-      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
-      crossorigin="anonymous"
-    />
-    <!--            <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-  </head>
+    lang="es"
+    xmlns:th="http://www.thymeleaf.org"
+    xlmns:sec="http://www.thymeleaf.org/extras/spring-security"
+    >
+    <head>
+        <title>Index</title>
+        <meta charset="UTF-8" />
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+            integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+            crossorigin="anonymous"
+            />
+        <!--            <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    </head>
 
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Menu</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      ><span class="navbar-toggler-icon"></span></button>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Menu</a>
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+                ><span class="navbar-toggler-icon"></span></button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            
-          <li class="nav-item active">
-            <a class="nav-link" href="/"
-              >Inicio<span class="sr-only">(current)</span></a>
-          </li>
-            
-          <li class="nav-item">
-            <a sec:authorize = "hasRole('ROLE_PERIODISTA')" class="nav-link" href="/noticia/creacionNoticia">Crear Noticia</a>
-          </li>
-            
-          <li class="nav-item">
-            <a class="nav-link" href="/noticia/noticiasGenerales">Noticias</a>
-          </li>
-            
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle"
-              href="/noticia/noticiasRecientes"
-              id="navbarDropdown"
-              role="button"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >Noticias recientes</a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a
-                th:each="noticia :${noticias}"
-                th:value="${noticia.idNoticia}"
-                th:text="${noticia.titulo}"
-                class="dropdown-item"
-                th:href="@{/noticia/__${noticia.idNoticia}__}"
-                th:unless="${noticiaStat.index > 9}"
-              ></a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Inicio<span class="sr-only">(current)</span></a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a sec:authorize = "hasRole('ROLE_PERIODISTA')" class="nav-link" href="/noticia/creacionNoticia">Crear Noticia</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/noticia/noticiasGenerales">Noticias</a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a
+                            class="nav-link dropdown-toggle"
+                            href="/noticia/noticiasRecientes"
+                            id="navbarDropdown"
+                            role="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            >Noticias recientes</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a
+                                th:each="noticia :${noticias}"
+                                th:value="${noticia.idNoticia}"
+                                th:text="${noticia.titulo}"
+                                class="dropdown-item"
+                                th:href="@{/noticia/__${noticia.idNoticia}__}"
+                                th:unless="${noticiaStat.index > 9}"
+                                ></a>
+                        </div>
+                    </li>
+
+                    <li sec:authorize = "hasRole('ROLE_ADMIN')" class="nav-item dropdown">
+                        <a
+                            class="nav-link dropdown-toggle"
+                            id="navbarDropdown"
+                            role="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            >Registrar personal</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href = "/admin/registrarAdmin">Registrar admin</a>
+                            <a class="dropdown-item" href = "/admin/registrarPeriodista">Registrar periodista</a>
+                        </div>
+                    </li>
+                </ul>
+
+                <div>
+                    <a  class="nav-link" href="/registrar" th:if="${session.usuariosession==null}">Registrar</a>
+                </div>
+
+                <div>
+                    <a class="nav-link" href="/login" th:if="${session.usuariosession==null}">Login</a>
+                </div>
+
+                <ul th:if="${session.usuariosession != null}" class="navbar-nav">
+                    <div>
+                        <li class="nav-item dropdown">
+                            <a
+                                class="nav-link dropdown-toggle"
+                                id="navbarDropdown"
+                                role="button"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                >Perfil</a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a  class="dropdown-item" th:href="@{/modificarPerfil/__${session.usuariosession.idUsuario}__}">Modificar perfil</a>
+                                <a  class="dropdown-item" href="/logout">LogOut</a>
+                            </div>
+                        </li>
+                </ul>
             </div>
-              
-          </li>
-            
-        </ul>
-          <div>
-                  <a  class="nav-link" href="/registrar" th:if="${session.usuariosession==null}">Registrar</a>
-              </div>
-              <div>
-                  <a class="nav-link" href="/login"th:if="${session.usuariosession==null}">Login</a>
-              </div>
-          <div>
-                  <a  class="nav-link" href="/logout" th:if="${session.usuariosession!=null}">LogOut</a>
-              </div>
-      </div>
+
+
+        </div>
     </nav>
 
     <div th:replace="/fragments/exito:: div"></div>
@@ -87,7 +118,7 @@
     <div th:replace="/fragments/error :: div"></div>
 
     <div th:replace="/fragments/java_script :: script"></div>
-    
-  </body>
-    
+
+</body>
+
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" sec:authorize = "hasAnyRole('ROLE_ADMIN','ROLE_PERIODISTA')" >
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xlmns:sec="http://www.thymeleaf.org/extras/spring-security" >
 
     <head>
         <title>Noticias Generales</title>
@@ -40,6 +40,23 @@
                                                class="dropdown-item" th:href="@{/noticia/__${noticia.idNoticia}__}" th:unless ="${noticiaStat.index > 9}"></a>
                                         </div>
                                     </li>
+
+                                    <li sec:authorize = "hasRole('ROLE_ADMIN')" class="nav-item dropdown">
+                                        <a
+                                            class="nav-link dropdown-toggle"
+                                            href="/noticia/noticiasRecientes"
+                                            id="navbarDropdown"
+                                            role="button"
+                                            data-toggle="dropdown"
+                                            aria-haspopup="true"
+                                            aria-expanded="false"
+                                            >Registrar personal</a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <a class="dropdown-item" href = "/admin/registrarAdmin">Registrar admin</a>
+                                            <a class="dropdown-item" href = "/admin/registrarPeriodista">Registrar periodista</a>
+                                        </div>
+                                    </li>
+
                                 </ul>
 
                                 <form class="form-inline my-2 my-lg-0"  action ="/noticia/noticiaBuscada" method ="POST">
@@ -56,7 +73,7 @@
                                     <th style = " width:15%;">ID</th>
                                     <th style = " width:20%;">Titulo</th>
                                     <th >Cuerpo</th>
-                                    <th sec:authorize = "hasAnyRole('ROLE_ADMIN','ROLE_PERIODISTA')" style = " width:5%;">Modificar</th>
+                                    <th sec:authorize = "hasRole('ROLE_PERIODISTA')" style = " width:5%;">Modificar</th>
                                     <th sec:authorize = "hasAnyRole('ROLE_ADMIN','ROLE_PERIODISTA')" style = " width:5%;">Eliminar</th>
                                 </tr>
                             </thead>
@@ -78,7 +95,7 @@
                                             <h5 th:text="${noticia.cuerpo}"></h5>
                                         </div>
                                     </td>
-                                    <td sec:authorize = "hasAnyRole('ROLE_ADMIN','ROLE_PERIODISTA')">
+                                    <td sec:authorize = "hasRole('ROLE_PERIODISTA')">
                                         <div>
                                             <a  
                                                 type="button" class="btn btn-primary"

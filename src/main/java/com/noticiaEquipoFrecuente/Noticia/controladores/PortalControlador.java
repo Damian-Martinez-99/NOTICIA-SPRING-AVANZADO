@@ -1,6 +1,7 @@
 package com.noticiaEquipoFrecuente.Noticia.controladores;
 
 import com.noticiaEquipoFrecuente.Noticia.entidades.Usuario;
+import com.noticiaEquipoFrecuente.Noticia.repositorios.UsuarioRepositorio;
 import com.noticiaEquipoFrecuente.Noticia.servicios.NoticiaServicio;
 import com.noticiaEquipoFrecuente.Noticia.servicios.UsuarioServicio;
 import javax.servlet.http.HttpSession;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/")
 public class PortalControlador {
 
+    @Autowired
+    private UsuarioRepositorio usuarioRepositorio;
+    
     @Autowired
     private NoticiaServicio noticiaServicio;
 
@@ -52,6 +57,27 @@ public class PortalControlador {
         }
     }
 
+    @GetMapping("/modificarPerfil/{idUsuario}")
+    public String modificiarPerfil(@PathVariable String idUsuario, ModelMap modelo) {
+        modelo.put("usuario", usuarioRepositorio.findById(idUsuario));
+        return "modificar_perfil.html";
+    }
+    
+       @PostMapping("/modificacionPerfil/{idUsuario}")
+    public String modificacionPerfil(@RequestParam String nombre, @RequestParam String password,
+            String password2, @PathVariable String idUsuario, ModelMap modelo, RedirectAttributes redireccion) {
+           try {
+            usuarioServicio.modificar(nombre, password, password2, idUsuario);
+            modelo.put("exito", "El usuario se modifico exitosamente!");
+            redireccion.addAttribute("exito", "El usuario se modifico exitosamente!");
+            return "redirect:/";
+        } catch (Exception ex) {
+            modelo.put("error", ex.getMessage());
+            modelo.put("nombre", nombre);
+            return "modificar_perfil.html";
+        }
+    }
+    
     @GetMapping("/login")
     public String login(@RequestParam(required = false) String error, ModelMap modelo, HttpSession session) {
 
@@ -65,4 +91,6 @@ public class PortalControlador {
         }
         return "login.html";
     }
+    
+    
 }

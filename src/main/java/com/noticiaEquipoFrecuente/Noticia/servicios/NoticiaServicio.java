@@ -61,16 +61,7 @@ public class NoticiaServicio {
         return noticias;
     }
 
-    private void Validar(String titulo, String cuerpo) throws Exception {
-        if (titulo.isEmpty() || titulo == null || titulo.equalsIgnoreCase(" ")) {
-            throw new Exception("El titulo no puede ser nulo o estar vacio.");
-        }
-        if (cuerpo.isEmpty() || cuerpo == null || cuerpo.equalsIgnoreCase(" ")) {
-            throw new Exception("El cuerpo no puede ser nulo o estar vacio.");
-        }
-    }
-
-    @Transactional
+        @Transactional
     public void EliminarNoticia(String idNoticia) throws Exception {
         ValidarID(idNoticia);
 
@@ -80,6 +71,15 @@ public class NoticiaServicio {
             Noticia noticia = respuesta.get();
             
             notiRepo.delete(noticia);
+        }
+    }
+    
+    private void Validar(String titulo, String cuerpo) throws Exception {
+        if (titulo.isEmpty() || titulo == null || titulo.equalsIgnoreCase(" ")) {
+            throw new Exception("El titulo no puede ser nulo o estar vacio.");
+        }
+        if (cuerpo.isEmpty() || cuerpo == null || cuerpo.equalsIgnoreCase(" ")) {
+            throw new Exception("El cuerpo no puede ser nulo o estar vacio.");
         }
     }
 

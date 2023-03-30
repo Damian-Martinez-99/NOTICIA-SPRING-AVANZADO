@@ -1,12 +1,10 @@
 package com.noticiaEquipoFrecuente.Noticia.controladores;
 
-import com.noticiaEquipoFrecuente.Noticia.Enumeradores.Rol;
 import com.noticiaEquipoFrecuente.Noticia.entidades.Noticia;
 import com.noticiaEquipoFrecuente.Noticia.entidades.Periodista;
 import com.noticiaEquipoFrecuente.Noticia.entidades.Usuario;
 import com.noticiaEquipoFrecuente.Noticia.servicios.NoticiaServicio;
 import java.util.List;
-import java.util.Optional;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,26 +26,23 @@ public class NoticiaControlador {
 
     @GetMapping("/{idNoticia}")
     public String idNoticia(@PathVariable String idNoticia, ModelMap modelo, HttpSession sesion) {
-        System.out.println("Error: "+ sesion.toString());
-//        Optional<HttpSession> respuesta = sesion.getAttribute("usuariosession");
-        if (sesion != null) {
+
+        try {
             Usuario usuario = (Usuario) sesion.getAttribute("usuariosession");
-             if (usuario.getRol().toString().equals("PERIODISTA")) {
-                 Periodista periodista = (Periodista) sesion.getAttribute("usuariosession");
+            if (usuario.getRol().toString().equals("PERIODISTA")) {
+                Periodista periodista = (Periodista) sesion.getAttribute("usuariosession");
                 modelo.put("usuario", periodista);
-                //hacer un else if
             } else {
                 modelo.put("usuario", usuario);
             }
-            
-        }else{            
-            modelo.put("usuarioNoLogueado", "userNoLogueado");
+            modelo.put("noticia", noticiaServicio.BuscarPorID(idNoticia));
+            modelo.put("noticias", noticiaServicio.Recientes());
+            return "noticia.html";
+        } catch (Exception e) {
+            modelo.put("noticia", noticiaServicio.BuscarPorID(idNoticia));
+            modelo.put("noticias", noticiaServicio.Recientes());
+            return "noticia.html";
         }
-        
-       
-        modelo.put("noticia", noticiaServicio.BuscarPorID(idNoticia));
-        modelo.put("noticias", noticiaServicio.Recientes());
-        return "noticia.html";
     }
 
     @PreAuthorize("hasRole('ROLE_PERIODISTA')")
@@ -113,17 +108,21 @@ public class NoticiaControlador {
 
     @GetMapping("/noticiasGenerales")
     public String noticiasGenerales(ModelMap modelo, HttpSession sesion) {
-        Usuario usuario = (Usuario) sesion.getAttribute("usuariosession");
-        Periodista periodista = null;
-        if (usuario.getRol().toString().equals("PERIODISTA")) {
-            periodista = (Periodista) sesion.getAttribute("usuariosession");
-            modelo.put("usuario", periodista);
-        } else {
-            modelo.put("usuario", usuario);
-        }
         modelo.put("busqueda", noticiaServicio.Recientes());
         modelo.put("noticias", noticiaServicio.Recientes());
-        return "noticias_generales.html";
+        try {
+            Usuario usuario = (Usuario) sesion.getAttribute("usuariosession");
+            Periodista periodista = null;
+            if (usuario.getRol().toString().equals("PERIODISTA")) {
+                periodista = (Periodista) sesion.getAttribute("usuariosession");
+                modelo.put("usuario", periodista);
+            } else {
+                modelo.put("usuario", usuario);
+            }
+            return "noticias_generales.html";
+        } catch (Exception e) {
+            return "noticias_generales.html";
+        }
     }
 
     @PostMapping("/noticiaBuscada")

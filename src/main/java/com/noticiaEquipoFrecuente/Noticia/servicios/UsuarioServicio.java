@@ -1,11 +1,13 @@
 package com.noticiaEquipoFrecuente.Noticia.servicios;
 
 import com.noticiaEquipoFrecuente.Noticia.Enumeradores.Rol;
+import com.noticiaEquipoFrecuente.Noticia.entidades.Noticia;
 import com.noticiaEquipoFrecuente.Noticia.entidades.Usuario;
 import com.noticiaEquipoFrecuente.Noticia.repositorios.UsuarioRepositorio;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,6 +41,22 @@ public class UsuarioServicio implements UserDetailsService {
         usuario.setRol(Rol.USER);
 
         usuarioRepositorio.save(usuario);
+    }
+
+    public void modificar(String nombreUsuario, String password, String password2, String idUsuario) throws Exception {
+        validar(nombreUsuario, password, password2);
+
+        Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
+
+        if (respuesta.isPresent()) {
+            Usuario usuario = respuesta.get();
+
+            usuario.setNombreUsuario(nombreUsuario);
+
+            usuario.setPassword(new BCryptPasswordEncoder().encode(password));
+
+            usuarioRepositorio.save(usuario);
+        }
     }
 
     private void validar(String nombreUsuario, String password, String password2) throws Exception {
