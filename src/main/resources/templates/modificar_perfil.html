@@ -16,12 +16,12 @@
             <form th:action="@{/modificacionPerfil/__${idUsuario}__}" method="POST">
                 <input th:value="${idUsuario}" hidden name="idUsuario"/>
                 <div class="form-group">
-                    <label for="nombre">Nombre de usuario</label>
-                    <input type="text" th:value="${usuario.nombreUsuario}" name = "nombreUsuario" class="form-control" id="nombre" aria-describedby="emailHelp">
+                    <label for="nombreUsuario">Nombre de usuario</label>
+                    <input type="text" th:value="${usuario.nombreUsuario}" name = "nombreUsuario" class="form-control" id="nombreUsuario" aria-describedby="emailHelp">
                 </div>
                 <div class="form-group">
                     <label for="password">Contraseña actual</label>
-                    <input type="text" th:value="${usuario.password}" name = "password" class="form-control" id="password">
+                    <input type="password" th:value="${password}" name = "password" class="form-control" id="password">
                 </div>
                 <div class="form-group">
                     <label for="password2">Repita su contraseña</label>

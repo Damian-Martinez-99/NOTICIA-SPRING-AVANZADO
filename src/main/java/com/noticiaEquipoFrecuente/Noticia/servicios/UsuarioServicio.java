@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,7 +27,7 @@ public class UsuarioServicio implements UserDetailsService {
 
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
-
+    @Transactional
     public void registrar(String nombreUsuario, String password, String password2) throws Exception {
         validar(nombreUsuario, password, password2);
 
@@ -42,21 +43,39 @@ public class UsuarioServicio implements UserDetailsService {
 
         usuarioRepositorio.save(usuario);
     }
-
+    @Transactional
     public void modificar(String nombreUsuario, String password, String password2, String idUsuario) throws Exception {
         validar(nombreUsuario, password, password2);
 
-        Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
+           Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
 
-        if (respuesta.isPresent()) {
+         if (respuesta.isPresent()) {
             Usuario usuario = respuesta.get();
 
             usuario.setNombreUsuario(nombreUsuario);
 
             usuario.setPassword(new BCryptPasswordEncoder().encode(password));
 
+            usuario.setRol(usuario.getRol());
+            
             usuarioRepositorio.save(usuario);
-        }
+     }
+    }
+    
+      public void validarContraseña(String idUsuario, String password) throws Exception{
+        
+         Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
+         boolean esCorrecta;
+         if(respuesta.isPresent()){
+            Usuario usuario = respuesta.get();
+            esCorrecta = new BCryptPasswordEncoder().matches(password, usuario.getPassword());
+            if(!esCorrecta){
+                throw new Exception("La contraseña es incorrecta");
+            
+            }
+         }
+         
+        
     }
 
     private void validar(String nombreUsuario, String password, String password2) throws Exception {

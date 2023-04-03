@@ -59,22 +59,38 @@ public class PortalControlador {
 
     @GetMapping("/modificarPerfil/{idUsuario}")
     public String modificiarPerfil(@PathVariable String idUsuario, ModelMap modelo) {
-        modelo.put("usuario", usuarioRepositorio.findById(idUsuario));
-        return "modificar_perfil.html";
+        modelo.put("usuario", usuarioRepositorio.getOne(idUsuario));
+        return "validar_contraseña.html";
+    }
+    
+    @PostMapping("/validarContraseña/{idUsuario}")
+    public String validarContraseña(@PathVariable String idUsuario, String password, ModelMap modelo){
+         modelo.put("usuario", usuarioRepositorio.getOne(idUsuario));
+         System.out.println(idUsuario + password);
+        try {
+           usuarioServicio.validarContraseña(idUsuario, password);
+           return "modificar_perfil.html"; 
+        } catch (Exception ex) {
+            modelo.put("error", ex.getMessage());
+            return "validar_contraseña.html"; 
+        }
     }
     
        @PostMapping("/modificacionPerfil/{idUsuario}")
-    public String modificacionPerfil(@RequestParam String nombre, @RequestParam String password,
+    public String modificacionPerfil(@RequestParam String nombreUsuario, @RequestParam String password,
             String password2, @PathVariable String idUsuario, ModelMap modelo, RedirectAttributes redireccion) {
            try {
-            usuarioServicio.modificar(nombre, password, password2, idUsuario);
+            usuarioServicio.modificar(nombreUsuario, password, password2, idUsuario);
             modelo.put("exito", "El usuario se modifico exitosamente!");
             redireccion.addAttribute("exito", "El usuario se modifico exitosamente!");
             return "redirect:/";
         } catch (Exception ex) {
             modelo.put("error", ex.getMessage());
-            modelo.put("nombre", nombre);
-            return "modificar_perfil.html";
+            redireccion.addAttribute("nombreUsuario", nombreUsuario);
+            redireccion.addAttribute("error", ex.getMessage());
+            redireccion.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/modificarPerfil/" + idUsuario;
+            
         }
     }
     
