@@ -35,10 +35,9 @@ public class NoticiaControlador {
             } else {
                 modelo.put("usuario", usuario);
             }
-            modelo.put("noticia", noticiaServicio.BuscarPorID(idNoticia));
-            modelo.put("noticias", noticiaServicio.Recientes());
-            return "noticia.html";
         } catch (Exception e) {
+            throw e;
+        } finally {
             modelo.put("noticia", noticiaServicio.BuscarPorID(idNoticia));
             modelo.put("noticias", noticiaServicio.Recientes());
             return "noticia.html";
@@ -72,26 +71,27 @@ public class NoticiaControlador {
         return "noticia_modificar.html";
     }
 
+    @PreAuthorize("hasRole('ROLE_PERIODISTA')")
     @PostMapping("/modificacionNoticia/{idNoticia}")
     public String modificacionNoticia(@RequestParam(required = false) String titulo, @RequestParam(required = false) String cuerpo, @PathVariable String idNoticia, ModelMap modelo, RedirectAttributes redireccion) {
         try {
             noticiaServicio.ModificarNoticia(titulo, cuerpo, idNoticia);
 //            redireccion.addFlashAttribute("exito", "La noticia fue modificada con exito!");
             redireccion.addAttribute("exito", "La noticia fue modificada con exito!");
+            modelo.put("noticias", noticiaServicio.Recientes());
+            return "redirect:/";
         } catch (Exception ex) {
 //            redireccion.addFlashAttribute("error", ex.getMessage());
             redireccion.addAttribute("error", ex.getMessage());
             return "redirect:/noticia/modificarNoticia/" + idNoticia;
         }
-        modelo.put("noticias", noticiaServicio.Recientes());
-        return "redirect:/";
     }
 
 //    @GetMapping("/eliminarNoticia/{idNoticia}")
 //    public String eliminarNoticia(@PathVariable String idNoticia, ModelMap modelo) {
 //        modelo.put("noticia", noticiaServicio.BuscarPorID(idNoticia));
 //        return "noticia_eliminar.html";
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_PERIODISTA')")
     @GetMapping("/eliminacionNoticia/{idNoticia}")
     public String eliminacionNoticia(@PathVariable String idNoticia, ModelMap modelo, RedirectAttributes redireccion) {
         modelo.put("noticia", noticiaServicio.BuscarPorID(idNoticia));
@@ -99,11 +99,11 @@ public class NoticiaControlador {
             noticiaServicio.EliminarNoticia(idNoticia);
 //            redireccion.addFlashAttribute("exito", "La noticia fue eliminada con exito!");
             redireccion.addAttribute("exito", "La noticia fue eliminada con exito!");
+            return "redirect:/";
         } catch (Exception ex) {
             modelo.put("error", ex.getMessage());
             return "/{idNoticia}";
         }
-        return "redirect:/";
     }
 
     @GetMapping("/noticiasGenerales")
@@ -119,25 +119,80 @@ public class NoticiaControlador {
             } else {
                 modelo.put("usuario", usuario);
             }
-            return "noticias_generales.html";
         } catch (Exception e) {
+            throw e;
+        } finally {
             return "noticias_generales.html";
         }
     }
 
     @PostMapping("/noticiaBuscada")
-    public String noticiasBuscada(ModelMap modelo, String titulo) {
+    public String noticiasBuscada(ModelMap modelo, String titulo, HttpSession sesion) {
         modelo.put("noticias", noticiaServicio.Recientes());
-        if (titulo == null) {
-            modelo.put("busqueda", noticiaServicio.Recientes());
-        } else {
-            List<Noticia> busqueda = noticiaServicio.BuscarPorTitulo(titulo);
-            if (busqueda == null || busqueda.isEmpty()) {
-                modelo.put("error", "La noticia buscada no existe.");
+        try {
+            Usuario usuario = (Usuario) sesion.getAttribute("usuariosession");
+            Periodista periodista = null;
+            if (usuario.getRol().toString().equals("PERIODISTA")) {
+                periodista = (Periodista) sesion.getAttribute("usuariosession");
+                modelo.put("usuario", periodista);
             } else {
-                modelo.put("busqueda", busqueda);
+                modelo.put("usuario", usuario);
             }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (titulo == null) {
+                modelo.put("busqueda", noticiaServicio.Recientes());
+            } else {
+                List<Noticia> busqueda = noticiaServicio.BuscarPorTitulo(titulo);
+                if (busqueda == null || busqueda.isEmpty() || titulo.isEmpty()) {
+                    modelo.put("error", "La noticia buscada no existe.");
+                } else if (!titulo.isEmpty()) {
+                    modelo.put("busqueda", busqueda);
+                }
+            }
+            return "noticias_generales.html";
         }
-        return "noticias_generales.html";
+    }
+
+    @PreAuthorize("hasRole('ROLE_PERIODISTA')")
+    @GetMapping("/misNoticias")
+    public String misNoticias(ModelMap modelo, HttpSession sesion) {
+        try {
+            Periodista periodista = (Periodista) sesion.getAttribute("usuariosession");
+            modelo.put("usuario", periodista);
+            modelo.put("noticias", noticiaServicio.ListarMisNoticias(periodista));
+            modelo.put("busqueda", noticiaServicio.ListarMisNoticias(periodista));
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            modelo.put("noticiasRecientes", noticiaServicio.Recientes());
+            return "mis_noticias.html";
+        }
+    }
+
+    @PreAuthorize("hasRole('ROLE_PERIODISTA')")
+    @PostMapping("/misNoticiasBuscadas")
+    public String misNoticiasBuscadas(ModelMap modelo, String titulo, HttpSession sesion) {
+        Periodista periodista = (Periodista) sesion.getAttribute("usuariosession");
+        try {
+            modelo.put("usuario", periodista);
+            modelo.put("noticias", noticiaServicio.ListarMisNoticias(periodista));
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            modelo.put("noticiasRecientes", noticiaServicio.Recientes());
+            if (titulo == null) {
+                modelo.put("busqueda", noticiaServicio.ListarMisNoticias(periodista));
+            } else {
+                List<Noticia> busqueda = noticiaServicio.BuscarMisNoticias(periodista, titulo);
+                if (busqueda == null || busqueda.isEmpty() || titulo.isEmpty()) {
+                    modelo.put("error", "La noticia buscada no existe.");
+                } else if (!titulo.isEmpty()) {
+                    modelo.put("busqueda", busqueda);
+                }
+            }
+            return "mis_noticias.html";
+        }
     }
 }

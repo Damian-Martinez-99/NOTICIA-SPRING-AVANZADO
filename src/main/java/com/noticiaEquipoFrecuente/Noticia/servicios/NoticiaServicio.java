@@ -25,14 +25,14 @@ public class NoticiaServicio {
         Noticia noticia = new Noticia();
 
         Date fecha = new Date();
-        
+
         noticia.setTitulo(titulo);
         noticia.setCuerpo(cuerpo);
         noticia.setFecha(fecha);
-        noticia.setCreador((Periodista)sesion.getAttribute("usuariosession"));
-        
+        noticia.setCreador((Periodista) sesion.getAttribute("usuariosession"));
+
         System.out.println(fecha);
-        
+
         notiRepo.save(noticia);
     }
 
@@ -61,7 +61,7 @@ public class NoticiaServicio {
         return noticias;
     }
 
-        @Transactional
+    @Transactional
     public void EliminarNoticia(String idNoticia) throws Exception {
         ValidarID(idNoticia);
 
@@ -69,11 +69,11 @@ public class NoticiaServicio {
 
         if (respuesta.isPresent()) {
             Noticia noticia = respuesta.get();
-            
+
             notiRepo.delete(noticia);
         }
     }
-    
+
     private void Validar(String titulo, String cuerpo) throws Exception {
         if (titulo.isEmpty() || titulo == null || titulo.equalsIgnoreCase(" ")) {
             throw new Exception("El titulo no puede ser nulo o estar vacio.");
@@ -84,20 +84,28 @@ public class NoticiaServicio {
     }
 
     private void ValidarID(String idNoticia) throws Exception {
-        if (idNoticia.isEmpty() || idNoticia == null || idNoticia .equalsIgnoreCase(" ")) {
+        if (idNoticia.isEmpty() || idNoticia == null || idNoticia.equalsIgnoreCase(" ")) {
             throw new Exception("El ID de la noticia no puede ser nulo o estar vacio.");
         }
     }
-    
+
     public Noticia BuscarPorID(String idNoticia) {
         return notiRepo.findById(idNoticia).get();
     }
-    
+
     public List<Noticia> Recientes() {
         return notiRepo.ListarRecientes();
     }
-    
+
     public List<Noticia> BuscarPorTitulo(String titulo) {
         return notiRepo.BuscarPorTitulo(titulo);
+    }
+
+    public List<Noticia> ListarMisNoticias(Periodista creador) {
+        return notiRepo.ListarMisNoticias(creador.getIdUsuario());
+    }
+
+    public List<Noticia> BuscarMisNoticias(Periodista creador, String titulo) {
+        return notiRepo.BuscarMisNoticias(creador.getIdUsuario(), titulo);
     }
 }

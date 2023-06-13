@@ -21,13 +21,13 @@ public class PortalControlador {
 
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
-    
+
     @Autowired
     private NoticiaServicio noticiaServicio;
 
     @Autowired
     private UsuarioServicio usuarioServicio;
-    
+
     @GetMapping("/")
     public String index(ModelMap modelo, String exito) {
         modelo.put("exito", exito);
@@ -62,24 +62,24 @@ public class PortalControlador {
         modelo.put("usuario", usuarioRepositorio.getOne(idUsuario));
         return "validar_contraseña.html";
     }
-    
+
     @PostMapping("/validarContraseña/{idUsuario}")
-    public String validarContraseña(@PathVariable String idUsuario, String password, ModelMap modelo){
-         modelo.put("usuario", usuarioRepositorio.getOne(idUsuario));
-         System.out.println(idUsuario + password);
+    public String validarContraseña(@PathVariable String idUsuario, String password, ModelMap modelo) {
+        modelo.put("usuario", usuarioRepositorio.getOne(idUsuario));
+        System.out.println(idUsuario + password);
         try {
-           usuarioServicio.validarContraseña(idUsuario, password);
-           return "modificar_perfil.html"; 
+            usuarioServicio.validarContraseña(idUsuario, password);
+            return "modificar_perfil.html";
         } catch (Exception ex) {
             modelo.put("error", ex.getMessage());
-            return "validar_contraseña.html"; 
+            return "validar_contraseña.html";
         }
     }
-    
-       @PostMapping("/modificacionPerfil/{idUsuario}")
+
+    @PostMapping("/modificacionPerfil/{idUsuario}")
     public String modificacionPerfil(@RequestParam String nombreUsuario, @RequestParam String password,
             String password2, @PathVariable String idUsuario, ModelMap modelo, RedirectAttributes redireccion) {
-           try {
+        try {
             usuarioServicio.modificar(nombreUsuario, password, password2, idUsuario);
             modelo.put("exito", "El usuario se modifico exitosamente!");
             redireccion.addAttribute("exito", "El usuario se modifico exitosamente!");
@@ -90,10 +90,9 @@ public class PortalControlador {
             redireccion.addAttribute("error", ex.getMessage());
             redireccion.addFlashAttribute("error", ex.getMessage());
             return "redirect:/modificarPerfil/" + idUsuario;
-            
         }
     }
-    
+
     @GetMapping("/login")
     public String login(@RequestParam(required = false) String error, ModelMap modelo, HttpSession session) {
 
@@ -103,10 +102,7 @@ public class PortalControlador {
         }
         if (error != null) {
             modelo.put("error", "Usuario o Contraseña invalidos.");
-
         }
         return "login.html";
     }
-    
-    
 }

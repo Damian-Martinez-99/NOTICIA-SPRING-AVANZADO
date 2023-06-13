@@ -4,6 +4,9 @@ import com.noticiaEquipoFrecuente.Noticia.Enumeradores.Rol;
 import com.noticiaEquipoFrecuente.Noticia.entidades.Periodista;
 import com.noticiaEquipoFrecuente.Noticia.repositorios.PeriodistaRepositorio;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +24,7 @@ public class PeriodistaServicio {
         Periodista periodista = new Periodista();
 
         periodista.setNombreUsuario(nombreUsuario);
-        
+
         periodista.setSueldoMensual(sueldoMensual);
 
         periodista.setPassword(new BCryptPasswordEncoder().encode(password));
@@ -29,6 +32,8 @@ public class PeriodistaServicio {
         periodista.setFechaDeAlta(new Date());
 
         periodista.setRol(Rol.PERIODISTA);
+        
+        periodista.setActivo(Boolean.TRUE);
 
         periodistaRepositorio.save(periodista);
     }
@@ -48,6 +53,33 @@ public class PeriodistaServicio {
         }
         if (sueldoMensual == null || sueldoMensual <= 0) {
             throw new Exception("Necesita cargar un valor posivito.");
+        }
+    }
+
+    public List<Periodista> listarPeriodistas() {
+        List<Periodista> periodistas = periodistaRepositorio.findAll();
+        return periodistas;
+    }
+
+    public List<Periodista> BuscarPorNombre(String nombre) {
+        return periodistaRepositorio.ListarPorNombre(nombre);
+    }
+
+    public void eliminarPeriodista(String idPeriodista) throws Exception {
+        validarID(idPeriodista);
+
+        Optional<Periodista> respuesta = periodistaRepositorio.findById(idPeriodista);
+
+        if (respuesta.isPresent()) {
+            Periodista periodista = respuesta.get();
+
+            periodistaRepositorio.delete(periodista);
+        }
+    }
+
+    private void validarID(String idPeriodista) throws Exception {
+        if (idPeriodista.isEmpty() || idPeriodista == null || idPeriodista.equalsIgnoreCase(" ")) {
+            throw new Exception("El ID del Periodista no puede ser nulo o estar vacio.");
         }
     }
 }

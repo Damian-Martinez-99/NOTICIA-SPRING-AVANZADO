@@ -17,12 +17,17 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Usuario {
-
-    @Id @GeneratedValue(generator = "uuid") @GenericGenerator(name = "uuid", strategy = "uuid2") private String idUsuario; 
-    @Column (unique = true) private String nombreUsuario;
+    @Id
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String idUsuario;
+    @Column(unique = true)
+    private String nombreUsuario;
     private String password;
-    @Temporal(TemporalType.TIMESTAMP) private Date fechaDeAlta;
-    @Enumerated(EnumType.STRING) private Rol rol;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaDeAlta;
+    @Enumerated(EnumType.STRING)
+    private Rol rol;
     private Boolean activo;
 
     public Usuario() {

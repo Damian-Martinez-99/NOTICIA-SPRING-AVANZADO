@@ -27,6 +27,7 @@ public class UsuarioServicio implements UserDetailsService {
 
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
+
     @Transactional
     public void registrar(String nombreUsuario, String password, String password2) throws Exception {
         validar(nombreUsuario, password, password2);
@@ -41,15 +42,18 @@ public class UsuarioServicio implements UserDetailsService {
 
         usuario.setRol(Rol.USER);
 
+        usuario.setActivo(Boolean.TRUE);
+
         usuarioRepositorio.save(usuario);
     }
+
     @Transactional
     public void modificar(String nombreUsuario, String password, String password2, String idUsuario) throws Exception {
         validar(nombreUsuario, password, password2);
 
-           Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
+        Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
 
-         if (respuesta.isPresent()) {
+        if (respuesta.isPresent()) {
             Usuario usuario = respuesta.get();
 
             usuario.setNombreUsuario(nombreUsuario);
@@ -57,25 +61,21 @@ public class UsuarioServicio implements UserDetailsService {
             usuario.setPassword(new BCryptPasswordEncoder().encode(password));
 
             usuario.setRol(usuario.getRol());
-            
+
             usuarioRepositorio.save(usuario);
-     }
+        }
     }
-    
-      public void validarContraseña(String idUsuario, String password) throws Exception{
-        
-         Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
-         boolean esCorrecta;
-         if(respuesta.isPresent()){
+
+    public void validarContraseña(String idUsuario, String password) throws Exception {
+        Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
+        boolean esCorrecta;
+        if (respuesta.isPresent()) {
             Usuario usuario = respuesta.get();
             esCorrecta = new BCryptPasswordEncoder().matches(password, usuario.getPassword());
-            if(!esCorrecta){
+            if (!esCorrecta) {
                 throw new Exception("La contraseña es incorrecta");
-            
             }
-         }
-         
-        
+        }
     }
 
     private void validar(String nombreUsuario, String password, String password2) throws Exception {
@@ -114,6 +114,50 @@ public class UsuarioServicio implements UserDetailsService {
 
         } else {
             return null;
+        }
+    }
+
+    public List<Usuario> listarUsuarios() {
+        List<Usuario> Usuarios = usuarioRepositorio.ListarUsuarios();
+        return Usuarios;
+    }
+
+    public List<Usuario> BuscarPorNombre(String nombre) {
+        return usuarioRepositorio.ListarPorNombre(nombre);
+    }
+
+    @Transactional
+    public void eliminarUsuario(String idUsuario) throws Exception {
+        validarID(idUsuario);
+
+        Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
+
+        if (respuesta.isPresent()) {
+            Usuario usuario = respuesta.get();
+
+            usuarioRepositorio.delete(usuario);
+        }
+    }
+
+    private void validarID(String idUsuario) throws Exception {
+        if (idUsuario.isEmpty() || idUsuario == null || idUsuario.equalsIgnoreCase(" ")) {
+            throw new Exception("El ID del Usuario no puede ser nulo o estar vacio.");
+        }
+    }
+
+    @Transactional
+    public void estado(String idUsuario, Boolean activo) throws Exception {
+        validarID(idUsuario);
+
+        Optional<Usuario> respuesta = usuarioRepositorio.findById(idUsuario);
+
+        if (respuesta.isPresent()) {
+            Usuario usuario = respuesta.get();
+            if (usuario.getActivo() == true) {
+                usuario.setActivo(false);
+            } else {
+                usuario.setActivo(true);
+            }
         }
     }
 }

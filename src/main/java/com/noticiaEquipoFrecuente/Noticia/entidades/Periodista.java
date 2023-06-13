@@ -38,6 +38,6 @@ public class Periodista extends Usuario {
 
     @Override
     public String toString() {
-        return "Periodista{" + "misNoticias=" + misNoticias + ", sueldoMensual=" + sueldoMensual + '}';
+        return "Periodista{sueldo Mensual = $" + sueldoMensual + '}';
     }
 }

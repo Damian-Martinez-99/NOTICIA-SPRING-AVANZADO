@@ -5,9 +5,9 @@
     xmlns:th="http://www.thymeleaf.org"
     xlmns:sec="http://www.thymeleaf.org/extras/spring-security"
     >
-
+    
     <head>
-        <title>Noticias Generales</title>
+        <title>Mis Noticias</title>
         <meta charset="UTF-8" />
         <link
             rel="stylesheet"
@@ -70,7 +70,7 @@
                         >
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a
-                                th:each="noticia :${noticias}"
+                                th:each="noticia :${noticiasRecientes}"
                                 th:value="${noticia.idNoticia}"
                                 th:text="${noticia.titulo}"
                                 class="dropdown-item"
@@ -92,16 +92,19 @@
                             >Personal</a
                         >
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href = "/admin/listaAdministradores">Admins</a>
-                            <a class="dropdown-item" href = "/admin/listaPeriodistas">Periodistas</a>
-                            <a class="dropdown-item" href = "/admin/listaUsuarios">Usuarios</a>
+                            <a class="dropdown-item" href="/admin/registrarAdmin"
+                               >Registrar Admin</a
+                            >
+                            <a class="dropdown-item" href="/admin/registrarPeriodista"
+                               >Registrar Periodista</a
+                            >
                         </div>
                     </li>
                 </ul>
 
                 <form
                     class="form-inline my-2 my-lg-0"
-                    action="/noticia/noticiaBuscada"
+                    action="/noticia/misNoticiasBuscadas"
                     method="POST"
                     >
                     <input
@@ -125,7 +128,7 @@
                 <tr>
                     <th style="width: 15%">ID</th>
                     <th style="width: 20%">Titulo</th>
-                    <th style="width: 50%">Cuerpo</th>
+                    <th>Cuerpo</th>
                     <th style="width: 5%">Abrir</th>
                     <th sec:authorize="hasRole('ROLE_PERIODISTA')" style="width: 5%">Modificar</th>
                     <th
